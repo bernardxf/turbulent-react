@@ -66,17 +66,35 @@ const P = styled.p`
   }
 `;
 
+function splitLines(text) {
+  const words = text.split(' ');
+  const lines = [];
+  let currentLine = '';
+
+  words.forEach((word) => {
+    if (currentLine.length + word.length <= 79) {
+      currentLine += ' ' + word;
+    } else {
+      if (currentLine.length) {
+        lines.push(currentLine.trim());
+      }
+      currentLine = word;
+    }
+  });
+
+  lines.push(currentLine.trim());
+  return lines;
+}
+
 export default function App() {
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
   const [show, setShow] = useState(Boolean);
   const [fullText, setFulltext] = useState([]);
 
   let onSubmit = (e) => {
     e.preventDefault();
-
-    var test = text.split(' ');
-    setFulltext(test);
-    // console.log('======', test);
+    const lines = splitLines(text);
+    setFulltext(lines);
   };
 
   let toDo = [{
@@ -93,34 +111,30 @@ export default function App() {
     newList.splice(sourceIdx, 1);
     newList.splice(destIdx, 0, draggedLink);
     toDo[0].list = newList;
+    setFulltext(toDo[0].list);
 
     setTimeout(() => {
       setShow(true);
-
-      // setTimeout(()=>{
-      //   setShow(false);
-      // }, 2000);
-
-//       fetch('https://mywebsite.com/endpoint/', {
-//   method: 'POST',
-//   headers: {
-//     'Accept': 'application/json',
-//     'Content-Type': 'application/json',
-//   },
-//   body: JSON.stringify({
-//     firstParam: 'yourValue',
-//     secondParam: 'yourOtherValue',
-//   })
-// })
-
+      fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: 'Turbulent React Test',
+          body: fullText
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      })
+      .then(response => response.json())
+      .then(json => {
+        console.log('response: ' + JSON.stringify(json));
+      });
     }, 2000);
   }
 
   return (
     <StyledContainer>
-
       <H2Styles>Turbulent React Test</H2Styles>
-
       <Form onSubmit={onSubmit}>
         <Textarea
           id="text"
@@ -131,9 +145,7 @@ export default function App() {
         />
         <Button>Send</Button>
       </Form>
-
       <P className={show ? 'show' : ''}>Has been saved!</P>
-
       <DragDropContext
         onDragEnd={onDragEnd}
       >

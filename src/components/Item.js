@@ -13,7 +13,7 @@ const StyledContainer = styled.div`
   border: ${props =>
     (props.isDragging ? '1px solid #198754;'
       : '1px solid #ccc')};
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.19);
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.19);
 `;
 
 export default function Item(props) {
